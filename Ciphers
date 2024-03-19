@@ -1,0 +1,870 @@
+
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <sstream>
+#include <bitset>
+#include <string>
+#include <cctype>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+string encrypt(string pt)
+{
+    string key[26]={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    string value[26]={"aaaaa","aaaab","aaaba","aaabb","aabaa","aabab","aabba","aabbb","abaaa","abaab","ababa","ababb","abbaa","abbab","abbba","abbbb","baaaa","baaab","baaba","baabb","babaa","babab","babba","babbb","bbaaa","bbaab"};
+
+    int i,j;
+    string encpt1="";
+    for(i=0;i<pt.length();i++)
+    {
+        for(j=0;j<26;j++)
+        {
+            if(pt.substr(i,1)==key[j])
+            {
+                encpt1=encpt1+value[j];
+                break;
+            }
+        }
+    }
+    return encpt1;
+}
+
+
+string baconianToText(string encpt) {
+
+    string key [26]={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    string value [26]={"aaaaa","aaaab","aaaba","aaabb","aabaa","aabab","aabba","aabbb","abaaa","abaab","ababa","ababb","abbaa","abbab","abbba","abbbb","baaaa","baaab","baaba","baabb","babaa","babab","babba","babbb","bbaaa","bbaab"};
+
+    string text = "";
+    for (int i = 0; i < encpt.length(); i += 5) {
+        string symbol = encpt.substr(i, 5);
+        for (int j = 0; j < 26; j++) {
+            if (value[j] == symbol) {
+                text += key[j];
+                break;
+            }
+        }
+    }
+    return text;
+}
+
+int start2()
+{
+    while (true){
+        string operation;
+        cout << "To start the game, enter 1. To end the game, enter 0:";
+        cin >> operation;
+        cin.ignore(); // Ignore newline character
+
+        if (operation == "1") {
+            string choice;
+            cout << "choose\nA) cipher\nB) deciper" << endl;
+            cin >> choice;
+            if (choice == "A" || choice == "a") {
+                string pt, encpt, decpt;
+                cout << "Enter a capital text: ";
+                cin.ignore();
+                getline(cin, pt);
+                encpt = encrypt(pt);
+                cout << "converted_text to Baconian  : " << encpt << endl;
+
+            } else if (choice == "B" || choice == "b") {
+                // Testing Baconian to text conversion
+                string baconian_cipher;
+                cout << "Enter Baconian cipher: ";
+                cin.ignore();
+                getline(cin, baconian_cipher);
+                string converted_text = baconianToText(baconian_cipher);
+                cout << "Converted Baconian to text: " << converted_text << endl;
+
+
+            }
+        }else if (operation == "0") {
+            cout << "EXIT  program" << endl;
+            break;
+
+        } else {
+            cout << "enter a valid choice " << endl;
+            continue;
+
+        }
+    }
+
+
+
+
+    return 0;
+}
+
+////////////////////////////////////////////////////////////
+
+string stringToHex(const string& input) {
+    stringstream ss;
+    for (unsigned char c : input) {
+        // Convert each character to its hexadecimal representation
+        ss << hex << setw(2) << setfill('0') << (int)c << " "; // Add a space after each pair of hexadecimal digits
+    }
+    // Return the hexadecimal representation as a string
+    return ss.str();
+}
+
+string xorEncrypt(const string& key, const string& plain) {
+    string output = "";
+    int keyIndex = 0;
+
+    for (char plain_char : plain) {
+        char key_char = key[keyIndex % key.size()]; // Get the current key character
+        char result = key_char ^ plain_char;
+        output += result;
+        keyIndex++;
+    }
+
+    return output;
+}
+
+string xordecryption(const string& key, const string& hexa) {
+    string output = "";
+    int keyIndex = 0;
+
+    for (char hexa_char : hexa) {
+        if (hexa_char == ' ' || hexa_char == '\n' || hexa_char == '\t') {
+            continue; // Ignore spaces, newlines, and tabs
+        }
+        int value;
+        stringstream ss;
+        ss << hex << hexa_char;
+        ss >> value;
+        char key_char = key[keyIndex % key.size()]; // Get the current key character
+        char result = key_char ^ static_cast<char>(value);
+        output += result;
+        keyIndex++;
+    }
+
+    return output;
+}
+
+int start3() {
+    while (true){
+        string operation;
+        cout << "To start the game, enter 1. To end the game, enter 0:";
+        cin >> operation;
+        cin.ignore(); // Ignore newline character
+
+        if (operation == "1") {
+
+            cout << "       welcome to XOR cipher       " << endl;
+            string operation;
+
+            cout << "1) xor Encrypt " << endl;
+            cout << "2) xor decryption " << endl;
+            cout << "enter your choise :";
+            cin >> operation;
+            if (operation == "1") {
+                string key;
+                string plain;
+
+                cout << "please enter your secret key : ";
+                cin >> key; // Read the entire line including whitespace characters
+                cin.ignore();
+
+                cout << "please enter your plain text : ";
+                getline(cin, plain);
+
+                string output = xordecryption(key, plain);
+
+                // Since the result is a non-printable character, it won't be displayed
+                cout << "Cipher text: " << output << endl;
+
+                string hexString = stringToHex(output);
+
+                // Output the hexadecimal representation
+                cout << "Hexadecimal representation: " << hexString << endl;
+
+
+            } else if (operation == "2") {
+                string key;
+                string hexa;
+
+                cout << "please enter your secret key : ";
+                cin >> key; // Read the entire line including whitespace characters
+                cin.ignore();
+
+                cout << "please enter the hexadecimal text : ";
+                getline(cin, hexa);
+
+                string result = xorEncrypt(key, hexa);
+                cout << "Decrypted text: " << result << endl;
+
+            } else {
+                cout << "please enter a valid operation" << endl;
+            }
+        }
+        else if (operation == "0") {
+            cout << "EXIT  program" << endl;
+            break;
+
+        } else {
+            cout << "enter a valid choice " << endl;
+            continue;
+
+        }
+    }
+
+    return 0;
+}
+
+//////////////////////////////////////////////////////
+
+string encryptMessage(const string& message, const string& keyword) {
+    string encryptedMessage = "";
+    int keywordIndex = 0;
+
+    for (char letter : message) {
+        if (isalpha(letter)) {
+            char base = isupper(letter) ? 'A' : 'a';
+            char encryptedChar = ((letter - base) + (toupper(keyword[keywordIndex]) - 'A')) % 26 + base;
+            encryptedMessage += encryptedChar;
+
+            keywordIndex = (keywordIndex + 1) % keyword.length();
+        } else {
+            encryptedMessage += letter;
+        }
+    }
+
+    return encryptedMessage;
+}
+
+int start1() {
+    string userMessage, userKeyword;
+    string operation;
+    while (true) {
+        cout << "To start the game, enter 1. To end the game, enter 0:";
+        cin >> operation;
+        cin.ignore(); // Ignore newline character
+
+        if (operation == "1") {
+
+            cout << "Enter the message (up to 80 characters): ";
+            getline(cin, userMessage);
+
+            cout << "Enter the keyword (up to 8 characters, alphabetic only): ";
+            getline(cin, userKeyword);
+
+            for (char ch: userKeyword) {
+                if (!isalpha(ch)) {
+                    cerr << "Keyword must contain only alphabetic characters." << endl;
+                    return 1;
+                }
+            }
+
+            if (userMessage.length() > 80) {
+                cerr << "Message length should not exceed 80 characters." << endl;
+                return 1;
+            }
+
+            string encryptedMessage = encryptMessage(userMessage, userKeyword);
+
+            cout << "Encrypted message: " << encryptedMessage << endl;
+        } else if (operation == "0") {
+            cout << "EXIT  program" << endl;
+            break;
+
+        } else {
+            cout << "enter a valid choice " << endl;
+            continue;
+
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+void choice1(){
+    const int ROWS1 = 5;
+    const int COLS1 = 5;
+    const int ROWS2 = 5;
+    const int COLS2 = 5;
+    char matrix1[ROWS1][COLS1] = {
+            {'a', 'b', 'c', 'd', 'e'},
+            {'f', 'g', 'h', 'j', 'k'},
+            {'l', 'm', 'n', 'o', 'p'},
+            {'q', 'r', 's', 't', 'u'},
+            {'v', 'w', 'x', 'y', 'z'}
+    };
+    char matrix2[ROWS2][COLS2][5] = {
+            {".-", "-...", "-.-.", "-..", "."},
+            {"..-.", "--.", "....", ".---", "-.-"},
+            {".-..", "--", "-.", "---", ".--."},
+            {"--.-", ".-.", "...", "-", "..-"},
+            {"...-", ".--", "-..-", "-.--", "--.."}
+    };
+
+    string choice;
+    string output = "";
+
+    cout << "Enter your line of string that you want to cipher: ";
+    getline(cin, choice);
+
+    for (char &ch1 : choice) {
+        ch1 = tolower(ch1);
+    }
+
+    for (char ch1 : choice) {
+        if (ch1 == ' ') {
+            output += "   "; // Replace space with underscore
+            continue;
+        }
+
+        for (int i = 0; i < ROWS1; ++i) {
+            for (int j = 0; j < COLS1; ++j) {
+                if (ch1 == matrix1[i][j]) {
+                    output += matrix2[i][j]; // Append Morse code
+                    output += ' ';
+                    break; // Exit inner loop once the character is found
+                }
+            }
+
+        }
+        if (ch1 == 'i') {
+            output += "..";
+        }}
+    cout << "The Morse code for \"" << choice << "\" is: " << output << endl;
+}
+
+void choice2(){
+    const int ROWS1 = 5;
+    const int COLS1 = 5;
+    const int ROWS2 = 5;
+    const int COLS2 = 5;
+    char matrix1[ROWS1][COLS1] = {
+            {'a', 'b', 'c', 'd', 'e'},
+            {'f', 'g', 'h', 'j', 'k'},
+            {'l', 'm', 'n', 'o', 'p'},
+            {'q', 'r', 's', 't', 'u'},
+            {'v', 'w', 'x', 'y', 'z'}
+    };
+    string matrix2[ROWS2][COLS2] = {
+            {".-", "-...", "-.-.", "-..", "."},
+            {"..-.", "--.", "....", ".---", "-.-"},
+            {".-..", "--", "-.", "---", ".--."},
+            {"--.-", ".-.", "...", "-", "..-"},
+            {"...-", ".--", "-..-", "-.--", "--.."}
+    };
+
+
+    string choice;
+    string output = "";
+    string ch="";
+
+    cout << "Enter your line of Morse code that you want to decipher: ";
+    getline(cin, choice);
+    for (int m=0;m<choice.size();++m){
+        if (choice[m] != ' '){
+            ch += choice[m];
+        }else if (choice[m] == ' ' && ch!=""){
+            for (int i = 0; i < ROWS1; ++i) {
+                for (int j = 0; j < COLS1; ++j) {
+                    if (ch == matrix2[i][j]) {
+                        output += matrix1[i][j]; // Append Morse code
+                        output += ' ';
+                        ch="";
+                        break; // Exit inner loop once the character is found
+                    }
+                }
+            }
+            if (ch == "..") {
+                output += 'i';
+                output+=' ';
+                ch="";
+            }
+
+        }
+        //  To handle last char;
+        if(m==choice.size()-1){
+            for (int i = 0; i < ROWS1; ++i) {
+                for (int j = 0; j < COLS1; ++j) {
+                    if (ch == matrix2[i][j]) {
+                        output += matrix1[i][j]; // Append Morse code
+                        output += ' ';
+                        ch="";
+                        break; // Exit inner loop once the character is found
+                    }
+                }
+            }
+            if (ch == "..") {
+                output += 'i';
+                output+=' ';
+                ch="";
+            }
+        }
+
+    }
+    cout << "The decoded string for Morse code \"" << choice << "\" is: " << output << endl;
+
+}
+
+int start4() {
+    while (true) {
+        cout << "Welcome to mose code "<< endl;
+        string operation;
+        cout << "To start the game, enter 1. To end the game, enter 0:";
+        cin >> operation;
+        cin.ignore(); // Ignore newline character
+
+        if (operation == "1") {
+            cout << "The game has started" << endl;
+            string value_cipher;
+            cout << "If you want to convert your line into Morse code, enter 1\n" ;
+            cout << ",else If you want to convert your Morse code to a string line, enter '2 :" ;
+            while (true) {
+                getline(cin,value_cipher);
+
+                if (value_cipher== "1") {
+                    choice1();
+                    break;
+                } else if (value_cipher  == "2") {
+                    choice2();
+                    break;
+                } else {
+                    cout << "Enter either 'to morse code' or 'from morse code'" << endl;
+                    continue;
+                }
+            }
+        } else if (operation == "0") {
+            cout << "Game over" << endl;
+            break;
+        } else {
+            cout << "Please enter a valid choice" << endl;
+            continue;
+        }
+    }
+    return 0;
+}
+#include <iostream>
+#include <string>
+using namespace std;
+
+// function to encrypt a message
+string encryptRailFence(string text, int key)
+{
+    // create the matrix to cipher plain text
+    // key = rows , length(text) = columns
+    char rail[key][(text.length())];
+
+    // filling the rail matrix to distinguish filled
+    // spaces from blank ones
+    for (int i=0; i < key; i++)
+        for (int j = 0; j < text.length(); j++)
+            rail[i][j] = '\n';
+
+    // to find the direction
+    bool dir_down = false;
+    int row = 0, col = 0;
+
+    for (int i=0; i < text.length(); i++)
+    {
+        // check the direction of flow
+        // reverse the direction if we've just
+        // filled the top or bottom rail
+        if (row == 0 || row == key-1)
+            dir_down = !dir_down;
+
+        // fill the corresponding alphabet
+        rail[row][col++] = text[i];
+
+        // find the next row using direction flag
+        dir_down?row++ : row--;
+    }
+
+    //now we can construct the cipher using the rail matrix
+    string result;
+    for (int i=0; i < key; i++)
+        for (int j=0; j < text.length(); j++)
+            if (rail[i][j]!='\n')
+                result.push_back(rail[i][j]);
+
+    return result;
+}
+
+// This function receives cipher-text and key
+// and returns the original text after decryption
+string decryptRailFence(string cipher, int key)
+{
+    // create the matrix to cipher plain text
+    // key = rows , length(text) = columns
+    char rail[key][cipher.length()];
+
+    // filling the rail matrix to distinguish filled
+    // spaces from blank ones
+    for (int i=0; i < key; i++)
+        for (int j=0; j < cipher.length(); j++)
+            rail[i][j] = '\n';
+
+    // to find the direction
+    bool dir_down;
+
+    int row = 0, col = 0;
+
+    // mark the places with '*'
+    for (int i=0; i < cipher.length(); i++)
+    {
+        // check the direction of flow
+        if (row == 0)
+            dir_down = true;
+        if (row == key-1)
+            dir_down = false;
+
+        // place the marker
+        rail[row][col++] = '*';
+
+        // find the next row using direction flag
+        dir_down?row++ : row--;
+    }
+
+    // now we can construct the fill the rail matrix
+    int index = 0;
+    for (int i=0; i<key; i++)
+        for (int j=0; j<cipher.length(); j++)
+            if (rail[i][j] == '*' && index<cipher.length())
+                rail[i][j] = cipher[index++];
+
+
+    // now read the matrix in zig-zag manner to construct
+    // the resultant text
+    string result;
+
+    row = 0, col = 0;
+    for (int i=0; i< cipher.length(); i++)
+    {
+        // check the direction of flow
+        if (row == 0)
+            dir_down = true;
+        if (row == key-1)
+            dir_down = false;
+
+        // place the marker
+        if (rail[row][col] != '*')
+            result.push_back(rail[row][col++]);
+
+        // find the next row using direction flag
+        dir_down?row++: row--;
+    }
+    return result;
+}
+
+//driver program to check the above functions
+int start5()
+{
+
+    while (true) {
+        string operation;
+        cout << "welcome to Rail-fence Cipher " << endl;
+        cout << "1) to encrypt" << endl;
+        cout << "2) to decrypt" << endl;
+        cout << "3) to exit" << endl;
+        cout << "enter your choice :";
+        cin >> operation;
+        if (operation == "1") {
+            string plaintext;
+            int key;
+            cout << "enter your plain text : ";
+            cin.ignore(); // Add this line
+            getline(cin, plaintext);
+            cout << "enter your key number : ";
+            cin >> key;
+            cin.ignore(); // Add this line
+            cout << "your encryption text is :";
+            cout << encryptRailFence(plaintext, key) << endl;
+
+        } else if (operation == "2") {
+            string ciphertext;
+            int key;
+            cout << "enter your cipher text : ";
+            cin.ignore(); // Add this line
+            getline(cin, ciphertext);
+            cout << "enter your key number: ";
+            cin >> key;
+            cin.ignore(); // Add this line
+            cout << "your decryption text is : ";
+            cout << decryptRailFence(ciphertext, key) << endl;
+
+        }
+        else if (operation =="3"){
+            cout<<"game over"<<endl;
+            break;
+        }
+        else {
+            cout <<"enter a valid choice "<<endl;
+            continue;
+        }
+
+    }
+
+
+    return 0;
+}
+#include <iostream>
+using namespace std;
+
+string message;
+string mappedkey;
+
+void messageANDkey() {
+    string msg;
+    cout << "Enter message: ";
+    getline(cin, msg);
+
+    // Message to uppercase
+    for (int i = 0; i < msg.length(); i++) {
+        msg[i] = toupper(msg[i]);
+    }
+
+    string key;
+    cout << "Enter key: ";
+    getline(cin, key);
+
+    // Key to uppercase
+    for (int i = 0; i < key.length(); i++) {
+        key[i] = toupper(key[i]);
+    }
+
+    // Mapping key to message
+    string keymap = "";
+    for (int i = 0, j = 0; i < msg.length(); i++) {
+        if (msg[i] == 32) {
+            keymap += " ";
+        } else {
+            if (j < key.length()) {
+                keymap += key[j];
+                j++;
+            } else {
+                j = 0;
+                keymap += key[j];
+                j++;
+            }
+        }
+    }
+
+    cout << "Message: " << msg << "\nKeymap: " << keymap << endl;
+
+    message = msg;
+    mappedkey = keymap;
+}
+
+int tableArr[26][26];
+
+void creatvigeneretable() {
+    for (int i = 0; i < 26; i++) {
+        for (int j = 0; j < 26; j++) {
+            int temp;
+            if ((i + 65) + j > 90) {
+                temp = ((i + 65) + j) - 26;
+                tableArr[i][j] = temp;
+            } else {
+                temp = (i + 65) + j;
+                tableArr[i][j] = temp;
+            }
+        }
+    }
+}
+
+void cipherEncryption(string message, string mappedkey) {
+    creatvigeneretable();
+    string encryptedText = "";
+    for (int i = 0; i < message.length(); i++) {
+        if (message[i] == 32 && mappedkey[i] == 32) {
+            encryptedText += " ";
+        } else {
+            int x = (int)message[i] - 65;
+            int y = (int)mappedkey[i] - 65;
+            encryptedText += (char)tableArr[x][y];
+        }
+    }
+    cout << "Encrypted Text: " << encryptedText << endl;
+}
+
+int itrcount(int key, int msg) {
+    int counter = 0;
+    string result = "";
+    for (int i = 0; i < 26; i++) {
+        char temp;
+        if (key + i > 90) {
+            temp = (char)(key + (i - 26));
+        } else {
+            temp = (char)(key + i);
+        }
+        result += temp;
+    }
+    for (int i = 0; i < result.length(); i++) {
+        if (result[i] == msg) {
+            break;
+        } else {
+            counter++;
+        }
+    }
+    return counter;
+}
+
+void cipherDecryption(string message, string mappedkey) {
+    string decryptedText = "";
+    for (int i = 0; i < message.length(); i++) {
+        if (message[i] == 32 && mappedkey[i] == 32) {
+            decryptedText += " ";
+        } else {
+            int temp = itrcount((int)mappedkey[i], (int)message[i]);
+            decryptedText += (char)(65 + temp);
+        }
+    }
+    cout << "Decrypted Text: " << decryptedText << endl;
+}
+
+int start6() {
+    while (true) {
+        char choice;
+        cout << "A) Encryption \n";
+        cout << "B) Decryption \n";
+        cout << "C) EXSIT \n";
+        cin >> choice;
+        cin.ignore();
+
+        if (choice == 'A' || choice == 'a') {
+            cout << "Encryption" << endl;
+            messageANDkey();
+            cipherEncryption(message, mappedkey);
+            // Exit the loop after successful encryption
+        } else if (choice == 'B' || choice == 'b') {
+            cout << "Decryption" << endl;
+            messageANDkey();
+            cipherDecryption(message, mappedkey);
+            // Exit the loop after successful decryption
+        }else if (choice=='c' || choice =='C'){
+            cout << " GAME OVER"<<endl;
+            break;
+        }
+        else {
+            cout << "Wrong choice" << endl;
+            continue;
+        }
+    }
+
+    return 0;
+}
+
+
+
+std::string encryptRouteCipher(const std::string& message, int key) {
+    std::vector<std::vector<char>> matrix;
+    int num_rows = std::ceil((double)message.length() / key);
+
+    matrix.resize(num_rows, std::vector<char>(key, ' '));
+
+    int index = 0;
+    for (int row = 0; row < num_rows; ++row) {
+        for (int col = 0; col < key; ++col) {
+            if (index < message.length()) {
+                matrix[row][col] = message[index++];
+            }
+        }
+    }
+
+    std::string encryptedMessage;
+    for (int col = 0; col < key; ++col) {
+        for (int row = 0; row < num_rows; ++row) {
+            if (matrix[row][col] != ' ') {
+                encryptedMessage += matrix[row][col];
+            }
+        }
+        for (int row = num_rows - 1; row >= 0; --row) {
+            if (matrix[row][col] != ' ' && col != key - 1) {
+                encryptedMessage += matrix[row][col];
+            }
+        }
+    }
+
+    return encryptedMessage;
+}
+
+int start7() {
+    string operation;
+    while (true) {
+        cout << "Welcome to route cipher"<<endl;
+        cout << "To start the game, enter 1. To end the game, enter 0:";
+        cin >> operation;
+        cin.ignore(); // Ignore newline character
+
+        if (operation == "1") {
+            std::string input_message;
+            int input_key;
+
+            std::cout << "Enter message: ";
+            std::getline(std::cin, input_message);
+
+            std::cout << "Enter key: ";
+            std::cin >> input_key;
+
+            std::string encrypted_message = encryptRouteCipher(input_message, input_key);
+            std::cout << "Encrypted message: " << encrypted_message << std::endl;
+        }else if (operation == "0") {
+            cout << "Game over" << endl;
+            break;
+        } else {
+            cout << "Please enter a valid choice" << endl;
+            continue;
+        }
+
+    }
+    return 0;
+}
+
+
+int main() {
+    while (true) {
+
+        string choice;
+        cout << "**welcome to our program**\n";
+        cout << "choose:\n";
+        cout << "1) atbash cipher\n";
+        cout << "2) Baconian cipher\n";
+        cout << "3) xor cipher\n";
+        cout << "4) morse code \n";
+        cout << "5) Rail fence \n";
+        cout << "6) Vignere Cipher \n";
+        cout << "7) Route \n";
+        cout << "8) Exit\n";
+        cout << "Enter your choice:";
+        cin >> choice;
+        if (choice == "1") {
+            start1();
+        } else if (choice == "2") {
+            start2();
+        } else if (choice == "3") {
+            start3();
+        } else if (choice == "4"){
+            start4();
+        }
+        else if (choice == "5"){
+            start5();
+        }
+        else if (choice == "6"){
+            start6();
+        }
+        else if (choice == "7"){
+            start7();
+        }
+        else if (choice =="8"){
+            cout << "GAME OVER"<<endl;
+            break;
+        }
+        else {
+            cout << "enter a valid choice "<< endl;
+            continue;
+        }
+    }
+    return 0;
+}
